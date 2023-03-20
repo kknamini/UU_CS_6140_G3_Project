@@ -2,10 +2,10 @@ import pandas as pd
 
 ###########################################################################################
 # Change the inpath to match the input filepath for '2007-2022-PIT-Counts-by-CoC.xlsx' file
-inpath = r'C:\Users\Kknam\Desktop\CS 6140\Project\Program\Combine Data'
+inpath = r''
 
 # Change the outpath to determine where the output files are written
-outpath = r'C:\Users\Kknam\Desktop\CS 6140\Project\Program\Combine Data'
+outpath = r''
 ###########################################################################################
 
 # Read all sheets in .xlsx file into dictionary of DataFrames
@@ -14,9 +14,19 @@ data = pd.read_excel(fr'{inpath}\2007-2022-PIT-Counts-by-CoC.xlsx', sheet_name=N
 # Lambda function to remove ', {year}' from the end of each variable it appears in
 slice_colname = lambda x: x if(x.find(',') == -1) else x[:-6]
 
-# Apply lambda function to rename columns for all data tables
+# Lambda functions to remove slight variations in column names that should be exactly the same
+black = lambda x: x if(x.find('Black') == -1) else f"{x[:19]}Black or African American"
+asian = lambda x: x if(x.find('Asian') == -1) else f"{x[:19]}Asian or Asian American"
+native = lambda x: x if(x.find('American Indian') == -1) else f"{x[:19]}American Indian or Alaska Native"
+nonbinary = lambda x: x if(x.find('Singularly') == -1 and x.find('Conforming') == -1) else f"{x[:19]}Nonbinary Gender"
+
+# Apply lambda functions to rename columns for all data tables
 for i in data:
     data[i].rename(columns=slice_colname, inplace=True)
+    data[i].rename(columns=black, inplace=True)
+    data[i].rename(columns=asian, inplace=True)
+    data[i].rename(columns=native, inplace=True)
+    data[i].rename(columns=nonbinary, inplace=True)
 
 # Function to determine the list of column names in the "data" input dictionary that repeat in range of years selected for analysis
 # "data" is a dictionary with 'year' (title of data table) as keys, and a list of column names as the value for each key (column names of each data table)
